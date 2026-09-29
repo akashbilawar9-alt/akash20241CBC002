@@ -1,0 +1,92 @@
+import re
+
+def analyze_email(email):
+    risk_score = 0
+    warnings = []
+
+    # 1. Check for urgent language
+    urgent_words = [
+        "urgent", "immediately", "act now",
+        "account will be closed", "within 24 hours",
+        "verify now", "limited time"
+    ]
+
+    for word in urgent_words:
+        if word.lower() in email.lower():
+            risk_score += 2
+            warnings.append("Urgent or threatening language detected.")
+            break
+
+    # 2. Check for sensitive information requests
+    sensitive_words = [
+        "password", "otp", "pin", "credit card",
+        "bank account", "cvv", "social security",
+        "login details"
+    ]
+
+    for word in sensitive_words:
+        if word.lower() in email.lower():
+            risk_score += 3
+            warnings.append("Request for sensitive information detected.")
+            break
+
+    # 3. Check for links
+    links = re.findall(r'https?://[^\s]+|www\.[^\s]+', email)
+
+    if links:
+        risk_score += 2
+        warnings.append("External link detected.")
+
+        # Check for suspicious URL patterns
+        for link in links:
+            if re.search(r'bit\.ly|tinyurl|login-|verify-|secure-', link.lower()):
+                risk_score += 2
+                warnings.append("Potentially suspicious link detected.")
+                break
+
+    # 4. Check for common phishing phrases
+    phishing_phrases = [
+        "verify your account",
+        "confirm your identity",
+        "you have won",
+        "claim your prize",
+        "click here to verify",
+        "update your payment"
+    ]
+
+    for phrase in phishing_phrases:
+        if phrase.lower() in email.lower():
+            risk_score += 3
+            warnings.append("Common phishing phrase detected.")
+            break
+
+    # Determine risk level
+    if risk_score >= 7:
+        risk_level = "HIGH RISK"
+    elif risk_score >= 4:
+        risk_level = "MEDIUM RISK"
+    else:
+        risk_level = "LOW RISK"
+
+    return risk_level, risk_score, warnings
+
+
+# Get email content
+print("=== Email Risk Analyzer ===")
+print("Enter the email content:")
+email = input("> ")
+
+# Analyze the email
+risk, score, warnings = analyze_email(email)
+
+# Display results
+print("\n--- Analysis Result ---")
+print("Risk Level:", risk)
+print("Risk Score:", score)
+
+if warnings:
+    print("\nWarnings:")
+    for warning in set(warnings):
+        print("-", warning)
+else:
+    print("No suspicious patterns detected.")
