@@ -1,0 +1,45 @@
+import time
+
+# Correct login details
+correct_username = "admin"
+correct_password = "Admin@123"
+
+# Maximum allowed attempts
+max_attempts = 3
+
+# Lock duration in seconds
+lock_time = 10
+
+attempts = 0
+
+print("=== Login Attempt Control System ===")
+
+while True:
+
+    username = input("\nEnter username: ")
+    password = input("Enter password: ")
+
+    # Check login credentials
+    if username == correct_username and password == correct_password:
+        print("Login successful!")
+        print("Access granted.")
+        break
+
+    else:
+        attempts += 1
+        remaining = max_attempts - attempts
+
+        print("Incorrect username or password.")
+
+        if remaining > 0:
+            print("Attempts remaining:", remaining)
+
+        # Lock the system after maximum failures
+        if attempts >= max_attempts:
+            print("\nToo many failed login attempts.")
+            print(f"Account locked for {lock_time} seconds.")
+
+            time.sleep(lock_time)
+
+            print("\nLock period ended. You may try again.")
+            attempts = 0
